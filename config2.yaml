@@ -1,0 +1,45 @@
+environment:
+  image: deepspeed/deepspeed:latest-torch170-cuda110
+  setup:
+    - pip install numpy==1.20.1 --user
+    - pip install transformers==4.18.0 --user
+    - pip install openai==0.3.0 --user
+    - pip install pandas==1.1.5 --user
+    - pip install sklearn --user
+    - pip install munkres --user
+    - pip install datasets --user
+    - pip install matplotlib --user
+    - pip install seaborn --user
+    - pip install deepspeed==0.6.4 --user
+
+target:
+  service: amlk8s
+  name: itplabrr1cl1
+  vc: resrchvc
+
+storage:
+  zhixhan:
+    storage_account_name: msranlpintern
+    container_name: zhixhan
+
+code:
+  local_dir: $CONFIG_DIR/
+
+search:
+  job_template:
+    name: zeroshot-pt-{model}-{dataset}-lr{lr}-bs{bs}
+    sku: 1xG1
+    priority: high
+    command:
+      - CUDA_VISIBLE_DEVICES=0,1,2,3 deepspeed --num_gpus=4 finetune.py --deepspeed ds_config_zero3.json --model={model} --dataset={dataset}  --bs={bs} --epochs=30 --lr={lr} --pt --output_dir='/mnt/zhixhan/pt_logs/gpt-j-rte-pt-lr{lr}-bs{bs}'
+  type: grid
+  max_trials: 100
+  params:
+    - name: model
+      values: ["EleutherAI/gpt-j-6B"]
+    - name: dataset
+      values: ["rte"]
+    - name: lr
+      values: [1e-4]
+    - name: bs
+      values: [8]

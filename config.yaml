@@ -1,0 +1,45 @@
+environment:
+  image: pytorch/pytorch:1.7.1-cuda11.0-cudnn8-devel
+  setup:
+    - pip install numpy==1.23.1 --user
+    - pip install transformers==4.19.2 --user
+    - pip install openai==0.3.0 --user
+    - pip install pandas==1.1.5 --user
+    - pip install sklearn --user
+    - pip install munkres --user
+    - pip install datasets --user
+    - pip install matplotlib --user
+    - pip install seaborn --user
+    - pip install deepspeed==0.6.4 --user
+
+target:
+  service: amlk8s
+  name: itplabrr1cl1 
+  vc: resrchvc
+
+storage:
+  zhixhan:
+    storage_account_name: msranlpintern
+    container_name: zhixhan
+
+code:
+  local_dir: $CONFIG_DIR/
+
+search:
+  job_template:
+    name: zeroshot-pt-{model}-{dataset}-lr{lr}-bs{bs}-sldb
+    sku: 1xG1
+    priority: high
+    command:
+      - python finetune.py --model={model} --dataset={dataset}  --bs={bs} --epochs=10 --lr={lr} --pt --output_dir='/mnt/zhixhan/pt_logs/gpt2-medium-agnews-pt2-evalgmm-rdm-sldb-lr1e-3-bs16' --plp="/mnt/zhixhan/local_pt_logs/gpt2-medium-agnews-pseudos/pt-1-gmm-rdm-sldb.pkl"
+  type: grid
+  max_trials: 100
+  params:
+    - name: model
+      values: ["gpt2-medium"]
+    - name: dataset
+      values: ["agnews"]
+    - name: lr
+      values: [1e-3]
+    - name: bs
+      values: [16]
