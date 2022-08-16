@@ -145,7 +145,7 @@ def construct_prompt(params, train_sentences, train_labels, test_sentence):
             l_str = l
 
         prompt += a_prefix
-        prompt += l_str + "\n\n"
+        prompt += l_str + "\n"
     if test_sentence != "":
         prompt += q_prefix
         prompt += test_sentence + "\n"

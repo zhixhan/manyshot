@@ -156,7 +156,7 @@ if __name__ == '__main__':
     parser.add_argument('--resume', dest='resume', action='store', required=False, type=str)
     parser.add_argument('--pretrain', dest='pretrain', action='store', required=False, type=str)
     parser.add_argument('--seed', dest='seed', action='store', required=False, type=int, default=4)
-    parser.add_argument('--num_shot', dest='num_shot', action='store', required=False, type=int, default=1)
+    parser.add_argument('--num_shot', dest='num_shot', action='store', required=False, type=int, default=4)
     args = parser.parse_args()
     args = vars(args)
     main(**args)

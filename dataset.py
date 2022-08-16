@@ -26,12 +26,11 @@ class TextClassificationDataset(Dataset):
         # define variables    
         all_train_sentences, all_train_labels, all_test_sentences, all_test_labels = loading_dataset(params)
         np.random.seed(params['seed'])
-        all_train_sentences, all_train_labels = random_sampling( all_train_sentences, all_train_labels, params['num_shot'])
-        np.random.seed(0)
-        all_test_sentences, all_test_labels = random_sampling(all_test_sentences, all_test_labels, 300)
+        all_train_sentences, all_train_labels = random_sampling(all_train_sentences, all_train_labels, params['num_shot'])
+        #np.random.seed(0)
+        #all_test_sentences, all_test_labels = random_sampling(all_test_sentences, all_test_labels, 300)
         all_texts = all_test_sentences if data_type=='test' else all_train_sentences
         all_labels = all_test_labels if data_type=='test' else all_train_labels
-        print(all_train_sentences)
         if data_type == 'demon':
             all_texts = [construct_prompt(params, [text], [label], "") for text,label in zip(all_texts, all_labels)]
             tokenizer.padding_side = "left"
@@ -46,6 +45,7 @@ class TextClassificationDataset(Dataset):
         self.input_ids = inputs['input_ids']
         self.labels = all_labels
         self.data_type = data_type
+
     def __len__(self):  
         return self.input_ids.shape[0]
 
@@ -61,8 +61,8 @@ class DemonClassificationDataset(Dataset):
         all_train_sentences, all_train_labels, all_test_sentences, all_test_labels = loading_dataset(params)
         np.random.seed(params['seed'])
         all_train_sentences, all_train_labels = random_sampling( all_train_sentences, all_train_labels, params['num_shot'])
-        np.random.seed(0)
-        all_test_sentences, all_test_labels = random_sampling(all_test_sentences, all_test_labels, 300)
+        #np.random.seed(0)
+        #all_test_sentences, all_test_labels = random_sampling(all_test_sentences, all_test_labels, 2)
         all_texts = all_test_sentences if data_type=='test' else all_train_sentences
         all_labels = all_test_labels if data_type=='test' else all_train_labels
         
@@ -77,7 +77,7 @@ class DemonClassificationDataset(Dataset):
         self.input_ids = inputs['input_ids']
         self.labels = all_labels
         self.data_type = data_type
-
+        print(inputs)
     def __len__(self):  
         return self.input_ids.shape[0]
 

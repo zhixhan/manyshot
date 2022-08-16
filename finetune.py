@@ -48,17 +48,21 @@ class TextClassificationTrainer(Trainer):
        
         attention_mask = model.context_mask.unsqueeze(0).expand(bs, -1)
         attention_mask = torch.cat([attention_mask,inputs['attention_mask']], dim=-1)
+        ori_mask = inputs['attention_mask']
         del inputs['attention_mask']
         outputs = model(**inputs, past_key_values=ctx_kv_expand, attention_mask=attention_mask, use_cache=False)        
         
         logits = outputs.get("logits")
-        prediction_logits = logits[:,-1]
+        vs = logits.size(-1)
+        target_inds = (ori_mask.sum(-1)-1).unsqueeze(-1).repeat(1, vs).view(bs, 1, vs)
+        prediction_logits = logits.gather(1, target_inds).squeeze(1)
+        #print(prediction_logits.shape)
+        #prediction_logits = logits[:,-1]
         batch_prediction_logits = prediction_logits[:,label_token_index]
         batch_prediction_probs = torch.softmax(batch_prediction_logits, dim=1)
         loss_ce = torch.nn.CrossEntropyLoss()
         loss = loss_ce(batch_prediction_logits, labels)
        
-        
         return (loss, dict(logits=batch_prediction_probs)) if return_outputs else loss
     
 def compute_metrics(eval_preds):
@@ -158,14 +162,14 @@ if __name__ == '__main__':
     parser.add_argument('--local_rank', dest='local_rank', action='store', required=False, type=int, default=-1)
     parser.add_argument('--deepspeed', dest='deepspeed', action='store', required=False, type=str, default=None)
 
-    parser.add_argument('--epochs', dest='epochs', action='store', required=False, type=int, default=4)
+    parser.add_argument('--epochs', dest='epochs', action='store', required=False, type=int, default=10)
     parser.add_argument('--bs', dest='bs', action='store', required=False, type=int, default=1)
     parser.add_argument('--lr', dest='lr', action='store', required=False, type=float, default=3e-5)
     parser.add_argument('--evaluate_only', dest='evaluate_only', action='store', required=False, type=str)
     parser.add_argument('--resume', dest='resume', action='store', required=False, type=str)
     parser.add_argument('--pretrain', dest='pretrain', action='store', required=False, type=str)
     parser.add_argument('--seed', dest='seed', action='store', required=False, type=int, default=4)
-    parser.add_argument('--num_shot', dest='num_shot', action='store', required=False, type=int, default=1)
+    parser.add_argument('--num_shot', dest='num_shot', action='store', required=False, type=int, default=4)
     args = parser.parse_args()
     args = vars(args)
     main(**args)

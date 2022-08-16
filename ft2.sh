@@ -4,6 +4,7 @@ python icl.py \
 --bs=2 \
 --epochs=20 \
 --lr=1e-5 \
+--num_shot=4 \
 --output_dir='/home/v-zhixhan/data/zhixhan/many_shot_logs/gpt2-xl-rte-demons-manyshot-ft' \
 --evaluate_only=''
 
