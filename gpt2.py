@@ -334,8 +334,7 @@ class GPT2Attention(nn.Module):
             past_key, past_value = layer_past
             key = torch.cat((past_key, key), dim=-2)
             value = torch.cat((past_value, value), dim=-2)
-            print(key[0][0])
-            assert False
+          
 
         
         if use_cache is True:

@@ -62,7 +62,7 @@ class DemonClassificationDataset(Dataset):
         np.random.seed(params['seed'])
         all_train_sentences, all_train_labels = random_sampling( all_train_sentences, all_train_labels, params['num_shot'])
         np.random.seed(0)
-        all_test_sentences, all_test_labels = random_sampling(all_test_sentences, all_test_labels, 2)
+        all_test_sentences, all_test_labels = random_sampling(all_test_sentences, all_test_labels, 300)
         all_texts = all_test_sentences if data_type=='test' else all_train_sentences
         all_labels = all_test_labels if data_type=='test' else all_train_labels
         
